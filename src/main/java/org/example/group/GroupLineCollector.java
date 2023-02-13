@@ -50,7 +50,7 @@ public class GroupLineCollector implements Collector<String[], Map<String, Map<I
                     if (("".equals(candidate[i])) || ("\"\"".equals(candidate[i])))
                         continue;
                     if (acc.containsKey(candidate[i])) {
-                        if (acc.get(candidate[i]).containsKey(i))               //Можно упростить, после 1 обновления Set
+                        if (acc.get(candidate[i]).containsKey(i))
                             acc.get(candidate[i]).get(i).addAll(tempGroup);
                         else {
                             acc.get(candidate[i]).put(i, pointerToExistingGroup);
