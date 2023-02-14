@@ -20,7 +20,7 @@ public class GroupStrategyImpl extends GroupStrategy {
     public BiConsumer<Map<String, Map<Integer, Set<String[]>>>, String[]> accumulator() {
         return (Map<String, Map<Integer, Set<String[]>>> acc, String[] candidate) -> {
 
-            var tempGroup = new HashSet<String[]>();
+            HashSet<String[]> tempGroup = new HashSet<>();
             tempGroup.add(candidate);
 
             for (int i = 0; i < candidate.length; ++i) {
@@ -91,14 +91,14 @@ public class GroupStrategyImpl extends GroupStrategy {
         return (Map<String, Map<Integer, Set<String[]>>> inputMap) -> {
 
             Set processedGroups = new HashSet<Set<String[]>>();
-            var result = new ArrayList<Set<String>>();
+            ArrayList<Set<String>> result = new ArrayList<>();
 
             for (String keyWord : inputMap.keySet()) {
                 for (int keyPosition : inputMap.get(keyWord).keySet()) {
                     if (processedGroups.contains(inputMap.get(keyWord).get(keyPosition)))
                         continue;
                     processedGroups.add(inputMap.get(keyWord).get(keyPosition));
-                    var group = new HashSet<String>();
+                    HashSet<String> group = new HashSet<>();
                     for (String[] arrayStrings : inputMap.get(keyWord).get(keyPosition)) {
                         String arrayStringsToSingle = arrayStrings[0];
                         for (int i = 1; i < arrayStrings.length; ++i) {

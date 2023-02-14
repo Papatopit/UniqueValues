@@ -11,29 +11,35 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public class Main {
-    private static final String regex = "(^([\"]{1})([0-9]+)([\"]{1})$)";
+    private static final String regex = "(^([\"]{1})([0-9]+)([\"]{1})$)|(^([\"]{1})([\"]{1}))";
     private static final String FILEPATH = "src/main/resources/lng.txt";
     private static final String SAVE_RESULT = "src/main/resources/result.txt";
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
+        process();
+    }
 
-        File file = new File(FILEPATH);
-        if (file.exists()) {
-            try (Scanner scanner = new Scanner(file);
-                 Stream<String> streamFromFile = scanner.tokens()) {
-                List<Set<String>> groups = streamFromFile
-                        .distinct()
-                        .map(x -> x.split(";"))
-                        .filter(Main::isStringValid)
-                        .collect(new GroupStrategyImpl());
-                groups.sort(Comparator.comparing(Set::size, Comparator.reverseOrder()));
-                saveGroupsIntoFile(groups);
-            }catch (IOException e){
-                e.printStackTrace();
-            }
-        }else {
-            System.out.println("File not found!");
+    public static void process(){
+        try (Scanner scanner = new Scanner(validateFile(FILEPATH));
+             Stream<String> streamFromFile = scanner.tokens()) {
+            List<Set<String>> groups = streamFromFile
+                    .distinct()
+                    .map(x -> x.split(";"))
+                    .filter(Main::isStringValid)
+                    .collect(new GroupStrategyImpl());
+            groups.sort(Comparator.comparing(Set::size, Comparator.reverseOrder()));
+            saveGroupsIntoFile(groups);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    public static File validateFile(String filePath){
+        File file = new File(filePath);
+        if (file.exists()) {
+            return file;
+        }
+        return null;
     }
 
     public static boolean isStringValid(String[] candidate) {
