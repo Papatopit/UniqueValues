@@ -1,6 +1,6 @@
 package org.example;
 
-import org.example.group.GroupLineCollector;
+import org.example.group.impl.GroupStrategyImpl;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -11,22 +11,28 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public class Main {
-    private static final String regex = "^([\"]{1})([0-9]+)([\"]{1})$|([\"]{1})([\"]{1})";
+    private static final String regex = "(^([\"]{1})([0-9]+)([\"]{1})$)";
     private static final String FILEPATH = "src/main/resources/lng.txt";
     private static final String SAVE_RESULT = "src/main/resources/result.txt";
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(FILEPATH))) {
-            Stream<String> streamFromFile = bufferedReader.lines();
-            List<Set<String>> groups = streamFromFile
-                    .distinct()
-                    .map(x -> x.split(";"))
-                    .filter(Main::isStringValid)
-                    .collect(new GroupLineCollector());
-            groups.sort(Comparator.comparing(Set::size, Comparator.reverseOrder()));
-
-            saveGroupsIntoFile(groups);
+        File file = new File(FILEPATH);
+        if (file.exists()) {
+            try (Scanner scanner = new Scanner(file);
+                 Stream<String> streamFromFile = scanner.tokens()) {
+                List<Set<String>> groups = streamFromFile
+                        .distinct()
+                        .map(x -> x.split(";"))
+                        .filter(Main::isStringValid)
+                        .collect(new GroupStrategyImpl());
+                groups.sort(Comparator.comparing(Set::size, Comparator.reverseOrder()));
+                saveGroupsIntoFile(groups);
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+        }else {
+            System.out.println("File not found!");
         }
     }
 
@@ -37,10 +43,15 @@ public class Main {
         return true;
     }
 
-    public static void saveGroupsIntoFile(List<Set<String>> results) throws IOException {
+    public static void saveGroupsIntoFile(List<Set<String>> results) {
         Path pathToResultFile = Paths.get(SAVE_RESULT);
-        if (Files.notExists(pathToResultFile))
-            Files.createFile(pathToResultFile);
+        if (Files.notExists(pathToResultFile)) {
+            try {
+                Files.createFile(pathToResultFile);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(pathToResultFile.toString()))) {
 
@@ -62,7 +73,8 @@ public class Main {
                     bufferedWriter.write("\n");
                 }
             }
-
+        }catch (IOException e){
+            e.printStackTrace();
         }
     }
 }

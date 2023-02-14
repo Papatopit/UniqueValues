@@ -1,4 +1,6 @@
-package org.example.group;
+package org.example.group.impl;
+
+import org.example.group.GroupStrategy;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -9,14 +11,12 @@ import java.util.stream.Collector;
 
 import static java.util.stream.Collector.Characteristics.UNORDERED;
 
-public class GroupLineCollector implements Collector<String[], Map<String, Map<Integer, Set<String[]>>>, List<Set<String>>> {
-
-    @Override
+public class GroupStrategyImpl extends GroupStrategy {
     public Supplier<Map<String, Map<Integer, Set<String[]>>>> supplier() {
         return () -> new HashMap<>();
     }
 
-    @Override
+
     public BiConsumer<Map<String, Map<Integer, Set<String[]>>>, String[]> accumulator() {
         return (Map<String, Map<Integer, Set<String[]>>> acc, String[] candidate) -> {
 
@@ -79,7 +79,7 @@ public class GroupLineCollector implements Collector<String[], Map<String, Map<I
         };
     }
 
-    @Override
+
     public BinaryOperator<Map<String, Map<Integer, Set<String[]>>>> combiner() {
         return (a1, a2) -> {
             throw new UnsupportedOperationException("Параллельность не реализована");
@@ -87,7 +87,6 @@ public class GroupLineCollector implements Collector<String[], Map<String, Map<I
     }
 
 
-    @Override
     public Function<Map<String, Map<Integer, Set<String[]>>>, List<Set<String>>> finisher() {
         return (Map<String, Map<Integer, Set<String[]>>> inputMap) -> {
 
@@ -115,8 +114,8 @@ public class GroupLineCollector implements Collector<String[], Map<String, Map<I
         };
     }
 
-    @Override
-    public Set<Characteristics> characteristics() {
+
+    public Set<Collector.Characteristics> characteristics() {
         return Collections.unmodifiableSet(EnumSet.of(UNORDERED));
     }
 }
