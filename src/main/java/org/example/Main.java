@@ -34,12 +34,11 @@ public class Main {
         }
     }
 
-    public static File validateFile(String filePath){
+    public static File validateFile(String filePath) throws FileNotFoundException {
         File file = new File(filePath);
-        if (file.exists()) {
-            return file;
-        }
-        return null;
+           if (file.exists()) {
+               return file;
+           } else throw new FileNotFoundException();
     }
 
     public static boolean isStringValid(String[] candidate) {
